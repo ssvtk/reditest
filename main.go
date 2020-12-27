@@ -10,18 +10,21 @@ type User struct {
 	Name  string `redis:"name"`
 	Age   int    `redis:"age"`
 	Email string `redis:"email"`
+	Posts int    `redis:"posts"`
 }
 
 func (u User) String() string {
-	return fmt.Sprintf("Name: %s\nAge: %d\nEmail: %s", u.Name, u.Age, u.Email)
+	return fmt.Sprintf("Name: %s\nAge: %d\nEmail: %s\nPosts: %d\n", u.Name, u.Age, u.Email, u.Posts)
 }
 
 func main() {
 	conn := Connect()
 	defer conn.Close()
+	for i := 1; i < getUserNumber(conn); i++ {
+		fmt.Println(getUser(i, conn))
 
-	fmt.Println(getUser(1, conn))
-	fmt.Println(getUser(2, conn))
+	}
+
 }
 
 func Connect() redis.Conn {
@@ -42,4 +45,12 @@ func getUser(userId int, conn redis.Conn) *User {
 		log.Fatal(err)
 	}
 	return &User
+}
+
+func getUserNumber(conn redis.Conn) int {
+	num, err := redis.Int(conn.Do("LLEN", "mylist"))
+	if err != nil {
+		log.Fatal(err)
+	}
+	return num
 }
