@@ -20,7 +20,7 @@ func (u User) String() string {
 func main() {
 	conn := Connect()
 	defer conn.Close()
-	for i := 1; i < getUserNumber(conn); i++ {
+	for i := 1; i < getUsersAmount(conn); i++ {
 		fmt.Println(getUser(i, conn))
 
 	}
@@ -47,7 +47,7 @@ func getUser(userId int, conn redis.Conn) *User {
 	return &User
 }
 
-func getUserNumber(conn redis.Conn) int {
+func getUsersAmount(conn redis.Conn) int {
 	num, err := redis.Int(conn.Do("LLEN", "mylist"))
 	if err != nil {
 		log.Fatal(err)
